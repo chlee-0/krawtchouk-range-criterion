@@ -1,0 +1,35 @@
+name: expand-readable-certificate
+
+on:
+  push:
+    branches:
+      - readable-exact-certificates
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    if: ${{ !contains(github.event.head_commit.message, '[expanded]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: readable-exact-certificates
+      - name: Expand legacy payload
+        run: python tools/expand_415512.py
+      - name: Verify exact certificates
+        run: |
+          python verify_4727.py
+          python verify_415512.py
+      - name: Commit readable verifier
+        run: |
+          if git diff --quiet -- verify_415512.py; then
+            echo "No generated change."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add verify_415512.py
+          git commit -m "Make (4,15,5,12) certificate human-readable [expanded]"
+          git push

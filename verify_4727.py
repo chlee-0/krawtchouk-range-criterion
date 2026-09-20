@@ -420,8 +420,7 @@ def bareiss_pd(ar, ai):
         if p <= 0:
             raise AssertionError(f"nonpositive leading principal determinant at {k + 1}")
         maxbits = max(maxbits, p.bit_length())
-        h.update((str(p) + "
-").encode())
+        h.update((str(p) + "\n").encode())
         if k == n - 1:
             break
         col = [a[i][k] for i in range(n)]
